@@ -1,0 +1,260 @@
+SLIP 1
+
+Q.1 Write a Java Program to implement I/O Decorator for converting uppercase letters to lower case letters.
+
+File 1: LowerCaseReader.java
+
+import java.io.FilterReader;
+import java.io.IOException;
+import java.io.Reader;
+
+public class LowerCaseReader extends FilterReader {
+    protected LowerCaseReader(Reader in) {
+        super(in);
+    }
+
+    @Override
+    public int read() throws IOException {
+        int c = super.read();
+        if (c != -1) {
+            c = Character.toLowerCase((char) c);
+        }
+        return c;
+    }
+
+    @Override
+    public int read(char[] cbuf) throws IOException {
+        int bytesRead = super.read(cbuf);
+        for (int i = 0; i < bytesRead; i++) {
+            cbuf[i] = Character.toLowerCase(cbuf[i]);
+        }
+        return bytesRead;
+    }
+
+    @Override
+    public int read(char[] cbuf, int off, int len) throws IOException {
+        int bytesRead = super.read(cbuf, off, len);
+        for (int i = off; i < off + bytesRead; i++) {
+            cbuf[i] = Character.toLowerCase(cbuf[i]);
+        }
+        return bytesRead;
+    }
+}
+
+
+
+
+File 2: Main.java
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.StringReader;
+
+public class Main {
+    public static void main(String[] args) {
+        String input = "HELLO WORLD! THIS IS A TEST STRING.";
+        
+        try (LowerCaseReader reader = new LowerCaseReader(new StringReader(input));
+             BufferedReader bufferedReader = new BufferedReader(reader)) {
+            
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+Just run second file only.
+
+Q.2 Write a program to sense the available networks using Arduino
+Create a New ESP32 Project
+On the Wokwi simulator, select the ESP32 Dev Board when creating your new project.
+2. Use the ESP32 WiFi Scan Code
+Paste this code in the editor (it works for ESP32):
+
+#include <WiFi.h>  // ESP32 uses WiFi.h
+
+void setup() {
+  Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  delay(100);
+  Serial.println("Scanning for available networks...");
+}
+
+void loop() {
+  int n = WiFi.scanNetworks();
+  Serial.println("Scan complete.");
+  if (n == 0) {
+    Serial.println("No networks found.");
+  } else {
+    Serial.print(n);
+    Serial.println(" network(s) found:");
+    for (int i = 0; i < n; ++i) {
+      Serial.print(i+1);
+      Serial.print(": ");
+      Serial.print(WiFi.SSID(i));
+      Serial.print(" (Signal: ");
+      Serial.print(WiFi.RSSI(i));
+      Serial.println(" dBm)");
+      delay(10);
+    }
+  }
+  Serial.println("");
+  delay(10000);
+}
+
+O/p
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:1156
+load:0x40078000,len:11456
+ho 0 tail 12 room 4
+load:0x40080400,len:2972
+entry 0x400805dc
+Scanning for available networks...
+Scan complete.
+1 network(s) found:
+1: Wokwi-GUEST (Signal: -74 dBm)
+
+Scan complete.
+1 network(s) found:
+1: Wokwi-GUEST (Signal: -82 dBm)
+
+Scan complete.
+1 network(s) found:
+1: Wokwi-GUEST (Signal: -86 dBm)
+
+
+
+
+
+
+
+
+
+
+Slip 2
+
+ Q.1 Write a Java Program to implement Singleton pattern for multithreading
+Singleton.java
+public class Singleton {
+    private static Singleton instance;
+
+    private Singleton() {
+        // Private constructor
+    }
+
+    private static synchronized Singleton getInstance() {
+        if (instance == null) {
+            instance = new Singleton();
+        }
+        return instance;
+    }
+
+    public static Singleton getInstanceSync() {
+        return getInstance();
+    }
+
+    public void doSomething() {
+        System.out.println("Doing something... Thread: " + Thread.currentThread().getName());
+    }
+}
+
+
+MainThread.java
+
+public class MainThread {
+    public static void main(String[] args) {
+        Thread t1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Singleton singleton = Singleton.getInstanceSync();
+                singleton.doSomething();
+            }
+        });
+
+        Thread t2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Singleton singleton = Singleton.getInstanceSync();
+                singleton.doSomething();
+            }
+        });
+
+        t1.start();
+        t2.start();
+    }
+}
+
+
+o/p:
+Doing something... Thread: Thread-1
+Doing something... Thread: Thread-0
+PS C:\Users\ADMIN\Desktop\SADP Slip Solution>
+
+Q.2 Write a program to measure the distance using ultrasonic sensor and make LED blink using Arduino.
+
+select the Arduino Uno board.
+1. Add the HC-SR04 Ultrasonic Sensor
+In the Wokwi editor, click the “+” (add component) button.
+Search for “HC-SR04” and add it to your schematic.
+2. Wire the Sensor Properly
+Connect the pins as follows:
+VCC → Arduino 5V
+GND → Arduino GND
+Trig → Arduino digital pin 9
+Echo → Arduino digital pin 10
+Code
+#define TRIG_PIN 9
+#define ECHO_PIN 10
+#define LED_PIN 13
+
+void setup() {
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  pinMode(LED_PIN, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  long duration, distance;
+  
+  // Clear trigPin
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+
+  // Set trigPin HIGH for 10 microseconds
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+
+  // Read echoPin
+  duration = pulseIn(ECHO_PIN, HIGH);
+
+  // Calculate distance in cm
+  distance = duration * 0.034 / 2;
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  // Blink LED if distance < 15cm
+  if (distance < 15) {
+    digitalWrite(LED_PIN, HIGH);
+    delay(250);
+    digitalWrite(LED_PIN, LOW);
+    delay(250);
+  } else {
+    digitalWrite(LED_PIN, LOW);
+  }
+
+  delay(500);
+}

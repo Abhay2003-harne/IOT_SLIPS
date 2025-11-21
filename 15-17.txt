@@ -1,0 +1,368 @@
+slip 15
+Q.1 Write a Java Program to implement Facade Design Pattern for Home Theater
+Amplifier.java
+public class Amplifier {
+    public void on() {
+        System.out.println("Amplifier ON");
+    }
+
+    public void off() {
+        System.out.println("Amplifier OFF");
+    }
+
+    public void setVolume(int level) {
+        System.out.println("Amplifier setting volume to " + level);
+    }
+}
+
+
+DVDPlayer.java
+public class DVDPlayer {
+    public void on() {
+        System.out.println("DVD Player ON");
+    }
+
+    public void off() {
+        System.out.println("DVD Player OFF");
+    }
+
+    public void play(String movie) {
+        System.out.println("DVD Player playing movie: " + movie);
+    }
+
+    public void stop() {
+        System.out.println("DVD Player stopped");
+    }
+}
+
+
+
+Projector.java
+public class Projector {
+    public void on() {
+        System.out.println("Projector ON");
+    }
+
+    public void off() {
+        System.out.println("Projector OFF");
+    }
+
+    public void wideScreenMode() {
+        System.out.println("Projector in widescreen mode");
+    }
+}
+
+
+Screen.java
+public class Screen {
+    public void down() {
+        System.out.println("Screen going DOWN");
+    }
+
+    public void up() {
+        System.out.println("Screen going UP");
+    }
+}
+
+
+
+Lights.java
+public class Lights {
+    public void dim(int level) {
+        System.out.println("Lights dimmed to " + level + "%");
+    }
+
+    public void on() {
+        System.out.println("Lights ON");
+    }
+}
+
+
+HomeTheaterFacade.java
+public class HomeTheaterFacade {
+    private Amplifier amp;
+    private DVDPlayer dvd;
+    private Projector projector;
+    private Screen screen;
+    private Lights lights;
+
+    public HomeTheaterFacade(Amplifier amp, DVDPlayer dvd, Projector projector, Screen screen, Lights lights) {
+        this.amp = amp;
+        this.dvd = dvd;
+        this.projector = projector;
+        this.screen = screen;
+        this.lights = lights;
+    }
+
+    public void watchMovie(String movie) {
+        System.out.println("Get ready to watch a movie...");
+        lights.dim(10);
+        screen.down();
+        projector.on();
+        projector.wideScreenMode();
+        amp.on();
+        amp.setVolume(15);
+        dvd.on();
+        dvd.play(movie);
+    }
+
+    public void endMovie() {
+        System.out.println("Shutting movie theater down...");
+        dvd.stop();
+        dvd.off();
+        amp.off();
+        projector.off();
+        screen.up();
+        lights.on();
+    }
+}
+
+
+HomeTheaterTest.java
+public class HomeTheaterTest {
+    public static void main(String[] args) {
+        Amplifier amp = new Amplifier();
+        DVDPlayer dvd = new DVDPlayer();
+        Projector projector = new Projector();
+        Screen screen = new Screen();
+        Lights lights = new Lights();
+
+        HomeTheaterFacade homeTheater = new HomeTheaterFacade(
+            amp, dvd, projector, screen, lights
+        );
+
+        homeTheater.watchMovie("Inception");
+        System.out.println();
+        homeTheater.endMovie();
+    }
+}
+How to Run in VS Code
+1.Create a folder (e.g., FacadeHomeTheater)
+2.Add all .java files:
+Amplifier.java, DVDPlayer.java, Projector.java, Screen.java, Lights.java, HomeTheaterFacade.java, HomeTheaterTest.java
+3.Open folder in VS Code
+4.Open Terminal (Ctrl + `)
+5.Compile and execute:
+bash
+javac *.java
+java HomeTheaterTest
+
+Slip 16
+Write a Java Program to implement Observer Design Pattern for number conversion. Accept a number in Decimal form and represent it in Hexadecimal, Octal and Binary. Change the Number and it reflects in other forms also
+Subject.java
+import java.util.*;
+
+public class Subject {
+    private List<Observer> observers = new ArrayList<>();
+    private int number;
+
+    public void attach(Observer obs) {
+        observers.add(obs);
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+        notifyAllObservers();
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    private void notifyAllObservers() {
+        for (Observer obs : observers) {
+            obs.update();
+        }
+    }
+}
+
+
+Observer.java
+public abstract class Observer {
+    protected Subject subject;
+    public abstract void update();
+}
+
+
+BinaryObserver.java
+public class BinaryObserver extends Observer {
+    public BinaryObserver(Subject subject) {
+        this.subject = subject;
+        this.subject.attach(this);
+    }
+    @Override
+    public void update() {
+        System.out.println("Binary: " + Integer.toBinaryString(subject.getNumber()));
+    }
+}
+
+
+OctalObserver.java
+public class OctalObserver extends Observer {
+    public OctalObserver(Subject subject) {
+        this.subject = subject;
+        this.subject.attach(this);
+    }
+    @Override
+    public void update() {
+        System.out.println("Octal: " + Integer.toOctalString(subject.getNumber()));
+    }
+}
+
+ 
+HexObserver.java
+public class HexObserver extends Observer {
+    public HexObserver(Subject subject) {
+        this.subject = subject;
+        this.subject.attach(this);
+    }
+    @Override
+    public void update() {
+        System.out.println("Hexadecimal: " + Integer.toHexString(subject.getNumber()).toUpperCase());
+    }
+}
+
+
+ObserverPatternTest.java
+import java.util.Scanner;
+
+public class ObserverPatternTest {
+    public static void main(String[] args) {
+        Subject numberSubject = new Subject();
+
+        new BinaryObserver(numberSubject);
+        new OctalObserver(numberSubject);
+        new HexObserver(numberSubject);
+
+        Scanner scanner = new Scanner(System.in);
+
+        while(true) {
+            System.out.print("Enter a decimal number (or -1 to exit): ");
+            int num = scanner.nextInt();
+            if (num == -1) break;
+            numberSubject.setNumber(num);
+            System.out.println();
+        }
+        scanner.close();
+    }
+}
+
+
+How to Run in VS Code
+1.Create a folder (e.g., ObserverNumberConversion)
+2.Add all .java files:
+Subject.java, Observer.java, BinaryObserver.java, OctalObserver.java, HexObserver.java, ObserverPatternTest.java
+3.Open the folder in VS Code
+4.Open terminal (Ctrl+`)
+5.Compile and run:
+bash
+javac *.java
+java ObserverPatternTest
+
+slip 17
+Q.1 Write a Java Program to implement Abstract Factory Pattern for Shape interface.
+Shape.java
+public interface Shape {
+    void draw();
+}
+
+
+RoundedRectangle.java
+public class RoundedRectangle implements Shape {
+    @Override
+    public void draw() {
+        System.out.println("Inside RoundedRectangle::draw() method.");
+    }
+}
+
+
+RoundedSquare.java
+public class RoundedSquare implements Shape {
+    @Override
+    public void draw() {
+        System.out.println("Inside RoundedSquare::draw() method.");
+    }
+}
+
+
+Rectangle.java
+public class Rectangle implements Shape {
+    @Override
+    public void draw() {
+        System.out.println("Inside Rectangle::draw() method.");
+    }
+}
+
+
+Square.java
+public class Square implements Shape {
+    @Override
+    public void draw() {
+        System.out.println("Inside Square::draw() method.");
+    }
+}
+
+AbstractFactory.java
+public abstract class AbstractFactory {
+    abstract Shape getShape(String shapeType);
+}
+
+
+RoundedShapeFactory.java
+public class RoundedShapeFactory extends AbstractFactory {
+    @Override
+    Shape getShape(String shapeType) {
+        if (shapeType.equalsIgnoreCase("RECTANGLE")) {
+            return new RoundedRectangle();
+        } else if (shapeType.equalsIgnoreCase("SQUARE")) {
+            return new RoundedSquare();
+        }
+        return null;
+    }
+}
+
+
+NormalShapeFactory.java
+public class NormalShapeFactory extends AbstractFactory {
+    @Override
+    Shape getShape(String shapeType) {
+        if (shapeType.equalsIgnoreCase("RECTANGLE")) {
+            return new Rectangle();
+        } else if (shapeType.equalsIgnoreCase("SQUARE")) {
+            return new Square();
+        }
+        return null;
+    }
+}
+
+
+FactoryProducer.java
+public class FactoryProducer {
+    public static AbstractFactory getFactory(boolean rounded) {
+        if (rounded) {
+            return new RoundedShapeFactory();
+        } else {
+            return new NormalShapeFactory();
+        }
+    }
+}
+
+
+AbstractFactoryPatternTest.java
+public class AbstractFactoryPatternTest {
+    public static void main(String[] args) {
+        AbstractFactory shapeFactory = FactoryProducer.getFactory(false);
+        Shape shape1 = shapeFactory.getShape("RECTANGLE");
+        shape1.draw();
+
+        Shape shape2 = shapeFactory.getShape("SQUARE");
+        shape2.draw();
+
+        AbstractFactory roundedShapeFactory = FactoryProducer.getFactory(true);
+        Shape shape3 = roundedShapeFactory.getShape("RECTANGLE");
+        shape3.draw();
+
+        Shape shape4 = roundedShapeFactory.getShape("SQUARE");
+        shape4.draw();
+    }
+}

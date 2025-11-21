@@ -1,0 +1,236 @@
+Slip 3
+
+Q.1 Write a JAVA Program to implement built-in support (java.util.Observable) Weather station with members temperature, humidity, pressure and methods mesurmentsChanged(), setMesurment(), getTemperature(), getHumidity(), getPressure()
+
+import java.util.Observable; 
+import java.util.Observer; 
+ 
+@SuppressWarnings("deprecation") 
+class WeatherStation extends Observable { 
+    private float temperature; 
+    private float humidity; 
+ private float pressure; 
+ 
+    public void setMeasurements(float temperature, float humidity, float pressure) { 
+        this.temperature = temperature; 
+        this.humidity = humidity; 
+        this.pressure = pressure; 
+        measurementsChanged(); 
+    } 
+ 
+    public void measurementsChanged() { 
+        setChanged(); 
+        notifyObservers(); 
+    } 
+ 
+    public float getTemperature() { 
+        return temperature; 
+    } 
+ 
+    public float getHumidity() { 
+        return humidity; 
+    } 
+ 
+    public float getPressure() { 
+        return pressure; 
+    } 
+} 
+ 
+@SuppressWarnings("deprecation") 
+class CurrentConditionsDisplay implements Observer, DisplayElement { 
+    private float temperature; 
+    private float humidity; 
+    public CurrentConditionsDisplay(Observable observable) { 
+        observable.addObserver(this); 
+    } 
+ 
+    public void update(Observable observable, Object arg) { 
+        if (observable instanceof WeatherStation) { 
+            WeatherStation weatherStation = (WeatherStation) observable; 
+            this.temperature = weatherStation.getTemperature(); 
+            this.humidity = weatherStation.getHumidity(); 
+            display(); 
+        } 
+    } 
+ 
+    public void display() { 
+        System.out.println("Current conditions: " + temperature + "F degrees and " + humidity + 
+"% humidity"); 
+    } 
+} 
+ 
+interface DisplayElement { 
+    void display(); 
+} 
+ 
+public class WeatherStationTest { 
+    public static void main(String[] args) { 
+        WeatherStation weatherStation = new WeatherStation(); 
+        new CurrentConditionsDisplay(weatherStation); 
+ 
+        weatherStation.setMeasurements(80, 65, 30.4f); 
+        weatherStation.setMeasurements(82, 70, 29.2f); 
+        weatherStation.setMeasurements(78, 90, 29.2f); 
+    } 
+}
+
+Q. 2 Write a program to detects the vibration of an object with sensor using Arduino.
+
+Board: Select Arduino Uno
+2. Add Components
+Button: Connect one side to Arduino digital pin 2 and other side to GND
+LED: Connect anode (+) to pin 13 (through resistor to GND)
+Code:
+#define SENSOR_PIN 2  // Button simulates vibration sensor DO
+#define LED_PIN 13    // LED pin
+
+void setup() {
+  pinMode(SENSOR_PIN, INPUT_PULLUP);  // Enable pull-up for button
+  pinMode(LED_PIN, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int vibration = digitalRead(SENSOR_PIN); // LOW when button pressed
+  
+  if (vibration == LOW) {  // Button pressed = "vibration detected"
+    Serial.println("Vibration detected!");
+    digitalWrite(LED_PIN, HIGH); // Turn on LED
+  } else {
+    Serial.println("No vibration.");
+    digitalWrite(LED_PIN, LOW);  // Turn off LED
+  }
+
+  delay(200);
+}
+
+
+
+
+Slip 4
+
+Q.1 Write a Java Program to implement Factory method for Pizza Store with createPizza(), orederPizza(), prepare(), Bake(), cut(), box(). Use this to create variety of pizza’s like NyStyleCheesePizza, ChicagoStyleCheesePizza etc.
+PizzaStoreTest.java
+// Abstract Product
+abstract class Pizza {
+    public abstract void prepare();
+    public abstract void bake();
+    public abstract void cut();
+    public abstract void box();
+}
+
+// Concrete Products
+class NYStyleCheesePizza extends Pizza {
+    @Override
+    public void prepare() { System.out.println("Preparing NY Style Cheese Pizza"); }
+    @Override
+    public void bake()    { System.out.println("Baking NY Style Cheese Pizza"); }
+    @Override
+    public void cut()     { System.out.println("Cutting NY Style Cheese Pizza"); }
+    @Override
+    public void box()     { System.out.println("Boxing NY Style Cheese Pizza"); }
+}
+
+class ChicagoStyleCheesePizza extends Pizza {
+    @Override
+    public void prepare() { System.out.println("Preparing Chicago Style Cheese Pizza"); }
+    @Override
+    public void bake()    { System.out.println("Baking Chicago Style Cheese Pizza"); }
+    @Override
+    public void cut()     { System.out.println("Cutting Chicago Style Cheese Pizza"); }
+    @Override
+    public void box()     { System.out.println("Boxing Chicago Style Cheese Pizza"); }
+}
+
+// Creator (Factory)
+abstract class PizzaStore {
+    // Factory method
+    public abstract Pizza createPizza(String type);
+
+    // Template method for ordering
+    public void orderPizza(String type) {
+        Pizza pizza = createPizza(type);
+        if (pizza == null) {
+            System.out.println("Unknown pizza type: " + type);
+            return;
+        }
+        pizza.prepare();
+        pizza.bake();
+        pizza.cut();
+        pizza.box();
+    }
+}
+
+// Concrete Creators
+class NYPizzaStore extends PizzaStore {
+    @Override
+    public Pizza createPizza(String type) {
+        if (type.equalsIgnoreCase("cheese")) {
+            return new NYStyleCheesePizza();
+        }
+        // more NY styles can be added here
+        return null;
+    }
+}
+
+class ChicagoPizzaStore extends PizzaStore {
+    @Override
+    public Pizza createPizza(String type) {
+        if (type.equalsIgnoreCase("cheese")) {
+            return new ChicagoStyleCheesePizza();
+        }
+        // more Chicago styles can be added here
+        return null;
+    }
+}
+
+// Test main
+public class PizzaStoreTest {
+    public static void main(String[] args) {
+        PizzaStore nyStore = new NYPizzaStore();
+        PizzaStore chicagoStore = new ChicagoPizzaStore();
+
+        System.out.println("-- NY Pizza Store Order --");
+        nyStore.orderPizza("cheese");
+
+        System.out.println("\n-- Chicago Pizza Store Order --");
+        chicagoStore.orderPizza("cheese");
+    }
+}
+    
+
+Q.2 Write a program to sense a finger when it is placed on the board Arduino.
+
+Instructions for Sensing a Finger (Touch Simulation) With Arduino in Wokwi
+1. Select Board & Components
+Board: Select Arduino Uno
+Sensor: Add a Button (to simulate the finger press)
+LED (optional, for visual feedback)
+2. Wiring Setup
+Button:
+One side → Arduino digital pin 2
+Other side → GND
+LED:
+Anode (+) → pin 13 (with 220Ω resistor to GND)
+Cathode (–) → GND
+Code :
+#define TOUCH_PIN 2  // Button pin simulating touch
+#define LED_PIN 13   // LED pin
+
+void setup() {
+  pinMode(TOUCH_PIN, INPUT_PULLUP); // Enable internal pull-up resistor
+  pinMode(LED_PIN, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int fingerDetected = digitalRead(TOUCH_PIN); // LOW if button pressed (finger "touched")
+  if (fingerDetected == LOW) {
+    Serial.println("Finger detected on board!");
+    digitalWrite(LED_PIN, HIGH); // LED ON
+  } else {
+    Serial.println("No finger detected.");
+    digitalWrite(LED_PIN, LOW);  // LED OFF
+  }
+  delay(200);
+}

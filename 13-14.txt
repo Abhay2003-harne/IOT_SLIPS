@@ -1,0 +1,237 @@
+slip 13
+Q.1 Write a Java Program to implement an Adapter design pattern in mobile charger. Define two classes – Volt (to measure volts) and Socket (producing constant volts of 120V). Build an adapter that can produce 3 volts, 12 volts and default 120 volts. Implements Adapter pattern using Class Adapter
+Volt.java
+public class Volt {
+    private int volts;
+
+    public Volt(int volts) {
+        this.volts = volts;
+    }
+
+    public int getVolts() {
+        return volts;
+    }
+
+    public void setVolts(int volts) {
+        this.volts = volts;
+    }
+}
+
+Socket.java
+public class Socket {
+    public Volt getVolt() {
+        return new Volt(120);
+    }
+}
+
+
+SocketAdapter.java
+public interface SocketAdapter {
+    Volt get3Volt();
+    Volt get12Volt();
+    Volt get120Volt();
+}
+
+
+SocketClassAdapterImpl.java
+public class SocketClassAdapterImpl extends Socket implements SocketAdapter {
+    @Override
+    public Volt get3Volt() {
+        return convertVolt(getVolt(), 40);
+    }
+
+    @Override
+    public Volt get12Volt() {
+        return convertVolt(getVolt(), 10);
+    }
+
+    @Override
+    public Volt get120Volt() {
+        return getVolt();
+    }
+
+    private Volt convertVolt(Volt v, int divisor) {
+        return new Volt(v.getVolts() / divisor);
+    }
+}
+
+
+AdapterPatternTest.java
+public class AdapterPatternTest {
+    public static void main(String[] args) {
+        SocketAdapter adapter = new SocketClassAdapterImpl();
+
+        Volt v3 = adapter.get3Volt();
+        Volt v12 = adapter.get12Volt();
+        Volt v120 = adapter.get120Volt();
+
+        System.out.println("Mobile needs 3V : " + v3.getVolts() + "V");
+        System.out.println("Needs 12V : " + v12.getVolts() + "V");
+        System.out.println("Needs 120V : " + v120.getVolts() + "V");
+    }
+}
+
+
+6. Compile and Run in VS Code
+1.Create a folder (e.g., AdapterMobileCharger)
+2.Add all five .java files (Volt.java, Socket.java, SocketAdapter.java, SocketClassAdapterImpl.java, AdapterPatternTest.java) in the folder
+3.Open terminal in VS Code
+Compile and run:
+bash
+javac *.java
+java AdapterPatternTest
+
+slip 14
+Q.1 Write a Java Program to implement Command Design Pattern for Command Interface with execute() . Use this to create variety of commands for LightOnCommand, LightOffCommand, GarageDoorUpCommand, StereoOnWithCDComman.
+Command.java
+public interface Command {
+    void execute();
+}
+public interface Command {
+    void execute();
+}
+
+
+Light.java
+public class Light {
+    public void on() {
+        System.out.println("Light is ON");
+    }
+
+    public void off() {
+        System.out.println("Light is OFF");
+    }
+}
+
+
+GarageDoor.java
+public class GarageDoor {
+    public void up() {
+        System.out.println("Garage Door is UP");
+    }
+}
+
+
+Stereo.java
+public class Stereo {
+    public void on() {
+        System.out.println("Stereo is ON");
+    }
+
+    public void setCD() {
+        System.out.println("Stereo is set for CD input");
+    }
+
+    public void setVolume(int volume) {
+        System.out.println("Stereo volume set to " + volume);
+    }
+}
+
+
+LightOnCommand.java
+public class LightOnCommand implements Command {
+    private Light light;
+    public LightOnCommand(Light light) {
+        this.light = light;
+    }
+    @Override
+    public void execute() {
+        light.on();
+    }
+}
+
+LightOffCommand.java
+public class LightOffCommand implements Command {
+    private Light light;
+    public LightOffCommand(Light light) {
+        this.light = light;
+    }
+    @Override
+    public void execute() {
+        light.off();
+    }
+}
+
+
+GarageDoorUpCommand.java
+public class GarageDoorUpCommand implements Command {
+    private GarageDoor garageDoor;
+    public GarageDoorUpCommand(GarageDoor garageDoor) {
+        this.garageDoor = garageDoor;
+    }
+    @Override
+    public void execute() {
+        garageDoor.up();
+    }
+}
+
+
+StereoOnWithCDCommand.java
+public class StereoOnWithCDCommand implements Command {
+    private Stereo stereo;
+    public StereoOnWithCDCommand(Stereo stereo) {
+        this.stereo = stereo;
+    }
+    @Override
+    public void execute() {
+        stereo.on();
+        stereo.setCD();
+        stereo.setVolume(11);
+    }
+}
+
+
+RemoteControl.java
+public class RemoteControl {
+    private Command command;
+    public void setCommand(Command command) {
+        this.command = command;
+    }
+    public void pressButton() {
+        command.execute();
+    }
+}
+
+
+CommandPatternTest.java
+public class CommandPatternTest {
+    public static void main(String[] args) {
+        Light light = new Light();
+        GarageDoor garageDoor = new GarageDoor();
+        Stereo stereo = new Stereo();
+
+        Command lightOn = new LightOnCommand(light);
+        Command lightOff = new LightOffCommand(light);
+        Command garageUp = new GarageDoorUpCommand(garageDoor);
+        Command stereoOnWithCD = new StereoOnWithCDCommand(stereo);
+
+        RemoteControl remote = new RemoteControl();
+
+        System.out.print("Press Light ON: ");
+        remote.setCommand(lightOn);
+        remote.pressButton();
+
+        System.out.print("Press Light OFF: ");
+        remote.setCommand(lightOff);
+        remote.pressButton();
+
+        System.out.print("Press Garage Door UP: ");
+        remote.setCommand(garageUp);
+        remote.pressButton();
+
+        System.out.print("Press Stereo ON with CD: ");
+        remote.setCommand(stereoOnWithCD);
+        remote.pressButton();
+    }
+}
+
+
+How to Run in VS Code
+1.Create a folder (e.g., CommandPatternDemo)
+2.Add all .java files above (Command.java, Light.java, LightOnCommand.java, LightOffCommand.java, GarageDoor.java, GarageDoorUpCommand.java, Stereo.java, StereoOnWithCDCommand.java, RemoteControl.java, CommandPatternTest.java)
+3.Open the folder in VS Code
+4.Open Terminal (Ctrl + `)
+5.Compile and run:
+bash
+javac *.java
+java CommandPatternTest

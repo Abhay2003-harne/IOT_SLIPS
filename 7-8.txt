@@ -1,0 +1,258 @@
+Slip 7
+Q.1 Write a Java Program to implement undo command to test Ceiling fan.
+CeilingFanUndoTest.java
+import java.util.Stack;
+
+// Command interface
+interface Command {
+    void execute();
+    void undo();
+}
+
+// Receiver: CeilingFan
+class CeilingFan {
+    private int speed; // 0 = off
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+        System.out.println("Ceiling fan speed set to " + speed);
+    }
+    public int getSpeed() { return speed; }
+}
+
+// Concrete command to set speed
+class CeilingFanSpeedCommand implements Command {
+    private CeilingFan ceilingFan;
+    private int prevSpeed;
+    private int newSpeed;
+
+    public CeilingFanSpeedCommand(CeilingFan ceilingFan, int newSpeed) {
+        this.ceilingFan = ceilingFan;
+        this.newSpeed = newSpeed;
+    }
+
+    public void execute() {
+        prevSpeed = ceilingFan.getSpeed();
+        ceilingFan.setSpeed(newSpeed);
+    }
+
+    public void undo() {
+        ceilingFan.setSpeed(prevSpeed);
+        System.out.println("(undo to speed " + prevSpeed + ")");
+    }
+}
+
+// Undo manager (Invoker)
+class UndoManager {
+    private Stack<Command> history = new Stack<>();
+
+    public void executeCommand(Command cmd) {
+        cmd.execute();
+        history.push(cmd);
+    }
+
+    public void undo() {
+        if(!history.isEmpty()) {
+            Command cmd = history.pop();
+            cmd.undo();
+        } else {
+            System.out.println("Nothing to undo!");
+        }
+    }
+}
+
+// Test class
+public class CeilingFanUndoTest {
+    public static void main(String[] args) {
+        CeilingFan fan = new CeilingFan();
+        UndoManager manager = new UndoManager();
+
+        manager.executeCommand(new CeilingFanSpeedCommand(fan, 1));
+        manager.executeCommand(new CeilingFanSpeedCommand(fan, 2));
+        manager.executeCommand(new CeilingFanSpeedCommand(fan, 3));
+
+        manager.undo();
+        manager.undo();
+        manager.undo();
+        manager.undo(); // nothing left to undo
+    }
+}
+
+
+Q.2 Write a program for LDR to vary the light intensity of LED using Arduino.
+LDR-controlled LED Brightness (Arduino Uno & Wokwi)
+1. Select Board & Components
+Arduino Uno (board)
+LDR (Light Dependent Resistor, search "LDR" or "photoresistor")
+10kΩ Resistor (for voltage divider)
+LED
+220Ω Resistor (for LED)
+
+2. Wiring Setup
+LDR and 10kΩ resistor form a voltage divider:
+One end of LDR → 5V
+Other end of LDR → A0 (Analog input on Arduino)
+Connect A0 to one end of the 10kΩ resistor
+Other end of 10kΩ resistor → GND
+LED:
+Anode (+) → Arduino pin 9 (PWM output)
+Cathode (–) → GND (through 220Ω resistor)
+Code
+#define LDR_PIN    A0   // Analog pin connected to LDR
+#define LED_PIN    9    // PWM pin for LED
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int ldrValue = analogRead(LDR_PIN);  // Read LDR value (0-1023)
+  int ledBrightness = map(ldrValue, 0, 1023, 0, 255);  // Scale for PWM
+
+  analogWrite(LED_PIN, ledBrightness);                // Set LED brightness
+
+  Serial.print("LDR Value: ");
+  Serial.print(ldrValue);
+  Serial.print(" | LED Brightness: ");
+  Serial.println(ledBrightness);
+
+  delay(200);
+}
+
+
+Slip 8 
+Q. 1 Write a Java Program to implement State Pattern for Gumball Machine. Create instance variable that holds current state from there, we just need to handle all actions, behaviors and state transition that can happen
+
+GumballMachine.java
+// State interface
+interface State {
+    void insertQuarter();
+    void ejectQuarter();
+    void turnCrank();
+    void dispense();
+}
+
+// Concrete States
+class NoQuarterState implements State {
+    private GumballMachine gumballMachine;
+    public NoQuarterState(GumballMachine gm) { this.gumballMachine = gm; }
+    public void insertQuarter() {
+        System.out.println("You inserted a quarter");
+        gumballMachine.setState(gumballMachine.getHasQuarterState());
+    }
+    public void ejectQuarter() { System.out.println("No quarter to eject"); }
+    public void turnCrank() { System.out.println("You turned, but there's no quarter"); }
+    public void dispense() { System.out.println("Pay first!"); }
+}
+
+class HasQuarterState implements State {
+    private GumballMachine gumballMachine;
+    public HasQuarterState(GumballMachine gm) { this.gumballMachine = gm; }
+    public void insertQuarter() { System.out.println("Can't insert another quarter"); }
+    public void ejectQuarter() {
+        System.out.println("Quarter returned");
+        gumballMachine.setState(gumballMachine.getNoQuarterState());
+    }
+    public void turnCrank() {
+        System.out.println("You turned the crank...");
+        gumballMachine.setState(gumballMachine.getSoldState());
+    }
+    public void dispense() { System.out.println("Turn crank first"); }
+}
+
+class SoldState implements State {
+    private GumballMachine gumballMachine;
+    public SoldState(GumballMachine gm) { this.gumballMachine = gm; }
+    public void insertQuarter() { System.out.println("Please wait, dispensing gumball"); }
+    public void ejectQuarter() { System.out.println("Already turned crank"); }
+    public void turnCrank() { System.out.println("Turning twice doesn't get you another gumball!"); }
+    public void dispense() {
+        gumballMachine.releaseBall();
+        if (gumballMachine.getCount() > 0) {
+            gumballMachine.setState(gumballMachine.getNoQuarterState());
+        } else {
+            System.out.println("Oops, out of gumballs!");
+            gumballMachine.setState(gumballMachine.getSoldOutState());
+        }
+    }
+}
+
+class SoldOutState implements State {
+    private GumballMachine gumballMachine;
+    public SoldOutState(GumballMachine gm) { this.gumballMachine = gm; }
+    public void insertQuarter() { System.out.println("Sold out!"); }
+    public void ejectQuarter() { System.out.println("Sold out, no quarter!"); }
+    public void turnCrank() { System.out.println("No gumballs"); }
+    public void dispense() { System.out.println("No gumballs dispensed"); }
+}
+
+// Context class
+public class GumballMachine {
+    private State soldOutState;
+    private State noQuarterState;
+    private State hasQuarterState;
+    private State soldState;
+
+    private State state;
+    private int count = 0;
+
+    public GumballMachine(int count) {
+        soldOutState = new SoldOutState(this);
+        noQuarterState = new NoQuarterState(this);
+        hasQuarterState = new HasQuarterState(this);
+        soldState = new SoldState(this);
+        this.count = count;
+        state = (count > 0) ? noQuarterState : soldOutState;
+    }
+
+    public void insertQuarter()   { state.insertQuarter();   }
+    public void ejectQuarter()    { state.ejectQuarter();    }
+    public void turnCrank()       { state.turnCrank(); state.dispense(); }
+
+    void setState(State s)        { state = s; }
+    void releaseBall() {
+        if(count > 0) {
+            System.out.println("A gumball comes rolling out the slot...");
+            count -= 1;
+        }
+    }
+    int getCount()               { return count; }
+    State getSoldOutState()      { return soldOutState; }
+    State getNoQuarterState()    { return noQuarterState; }
+    State getHasQuarterState()   { return hasQuarterState; }
+    State getSoldState()         { return soldState; }
+
+    public String toString() {
+        return "GumballMachine [gumballs left: " + count + "]";
+    }
+
+    // Test driver
+    public static void main(String[] args) {
+        GumballMachine gumballMachine = new GumballMachine(2);
+
+        System.out.println(gumballMachine);
+
+        gumballMachine.insertQuarter();
+        gumballMachine.turnCrank();
+
+        System.out.println(gumballMachine);
+
+        gumballMachine.insertQuarter();
+        gumballMachine.ejectQuarter();
+        gumballMachine.turnCrank();
+
+        System.out.println(gumballMachine);
+
+        gumballMachine.insertQuarter();
+        gumballMachine.turnCrank();
+
+        System.out.println(gumballMachine);
+    }
+}
+
+
+
+Q.2 Start Raspberry Pi and execute various Linux commands in command terminal window: ls, cd, touch, mv, rm, man, mkdir, rmdir, tar, gzip, cat, more, less, ps, sudo, cron, chown, chgrp, pingetc.
+o/p
+Sign up on Webminal.org → log in → start typing Linux commands in the web terminal.

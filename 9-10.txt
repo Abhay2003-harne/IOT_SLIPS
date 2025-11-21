@@ -1,0 +1,263 @@
+Slip 9 
+Q.1 Design simple HR Application using Spring Framework
+
+Q.2 Write python programs on Pi : a) Read your name and print Hello message with name b) Read two numbers and print their sum, difference, product and division. c) Word and character count of a given string. [15 M] d) Area of a given shape (rectangle, triangle and circle) reading shape and appropriate values from standard input.
+
+a) Read your name and print Hello message
+python
+name = input("Enter your name: ")
+print(f"Hello, {name}!")
+
+b) Read two numbers and print their sum, difference, product, and division
+python
+a = float(input("Enter first number: "))
+b = float(input("Enter second number: "))
+
+print("Sum =", a + b)
+print("Difference =", a - b)
+print("Product =", a * b)
+if b != 0:
+    print("Division =", a / b)
+else:
+    print("Division = Error (cannot divide by zero)")
+
+c) Word and character count of a given string
+python
+text = input("Enter a string: ")
+words = text.split()
+word_count = len(words)
+char_count = len(text)
+
+print("Word count =", word_count)
+print("Character count =", char_count)
+
+d) Area of a given shape (rectangle, triangle, circle)
+python
+import math
+
+shape = input("Enter shape (rectangle, triangle, circle): ").strip().lower()
+
+if shape == "rectangle":
+    length = float(input("Enter length: "))
+    width = float(input("Enter width: "))
+    area = length * width
+    print("Area of rectangle =", area)
+
+elif shape == "triangle":
+    base = float(input("Enter base: "))
+    height = float(input("Enter height: "))
+    area = 0.5 * base * height
+    print("Area of triangle =", area)
+
+elif shape == "circle":
+    radius = float(input("Enter radius: "))
+    area = math.pi * radius ** 2
+    print("Area of circle =", area)
+
+else:
+    print("Unknown shape!")
+
+
+slip 10 
+Q.1 Write a Java Program to implement Strategy Pattern for Duck Behavior. Create instance variable that holds current state of Duck from there, we just need to handle all Flying Behaviors and Quack Behavior
+
+FlyBehavior.java
+public interface FlyBehavior {
+    void fly();
+}
+
+
+FlyWithWings.java
+public class FlyWithWings implements FlyBehavior {
+    @Override
+    public void fly() {
+        System.out.println("I'm flying with wings!");
+    }
+}
+
+
+FlyNoWay.java
+public class FlyNoWay implements FlyBehavior {
+    @Override
+    public void fly() {
+        System.out.println("I can't fly.");
+    }
+}
+
+
+FlyRocketPowered.java
+public class FlyRocketPowered implements FlyBehavior {
+    @Override
+    public void fly() {
+        System.out.println("I'm flying with a rocket!");
+    }
+}
+
+
+QuackBehavior.java
+public interface QuackBehavior {
+    void quack();
+}
+
+
+Quack.java
+public class Quack implements QuackBehavior {
+    @Override
+    public void quack() {
+        System.out.println("Quack!");
+    }
+}
+
+
+MuteQuack.java
+public class MuteQuack implements QuackBehavior {
+    @Override
+    public void quack() {
+        System.out.println("<< Silence >>");
+    }
+}
+
+
+Squeak.java
+public class Squeak implements QuackBehavior {
+    @Override
+    public void quack() {
+        System.out.println("Squeak!");
+    }
+}
+
+
+Duck.java
+public abstract class Duck {
+    protected FlyBehavior flyBehavior;
+    protected QuackBehavior quackBehavior;
+
+    public void setFlyBehavior(FlyBehavior fb) {
+        flyBehavior = fb;
+    }
+
+    public void setQuackBehavior(QuackBehavior qb) {
+        quackBehavior = qb;
+    }
+
+    public void performFly() {
+        flyBehavior.fly();
+    }
+
+    public void performQuack() {
+        quackBehavior.quack();
+    }
+
+    public abstract void display();
+}
+
+
+
+MallardDuck.java
+public class MallardDuck extends Duck {
+    public MallardDuck() {
+        flyBehavior = new FlyWithWings();
+        quackBehavior = new Quack();
+    }
+
+    @Override
+    public void display() {
+        System.out.println("I'm a Mallard Duck.");
+    }
+}
+
+
+ModelDuck.java
+public class ModelDuck extends Duck {
+    public ModelDuck() {
+        flyBehavior = new FlyNoWay();
+        quackBehavior = new Quack();
+    }
+
+    @Override
+    public void display() {
+        System.out.println("I'm a Model Duck.");
+    }
+}
+
+
+StrategyPatternTest.java
+public class StrategyPatternTest {
+    public static void main(String[] args) {
+        Duck mallard = new MallardDuck();
+        mallard.display();
+        mallard.performFly();
+        mallard.performQuack();
+
+        System.out.println();
+
+        Duck model = new ModelDuck();
+        model.display();
+        model.performFly();
+        model.performQuack();
+
+        System.out.println("Changing model duck's fly behavior...");
+        model.setFlyBehavior(new FlyRocketPowered());
+        model.performFly();
+    }
+}
+
+
+How to Run in VS Code
+1.Create a folder (e.g., DuckStrategyPattern)
+2.Place all .java files inside:
+FlyBehavior.java, FlyWithWings.java, FlyNoWay.java, FlyRocketPowered.java, QuackBehavior.java, Quack.java, MuteQuack.java, Squeak.java, Duck.java, MallardDuck.java, ModelDuck.java, StrategyPatternTest.java
+3.Open the folder in VS Code
+4.Open terminal (Ctrl + `)
+5.Compile and run:
+bash
+javac *.java
+java StrategyPatternTest
+
+Q.2 Write python programs on Pi like: a) Print a name 'n' times, where name and n are read from standard input, using for and while loops. b) Handle Divided by Zero Exception. c) Print current time for 10 times with an interval of10seconds. d) Read a fileline byline and print the word count of each line
+a) Print a name 'n' times (using for and while loops)
+Using for loop:
+python
+name = input("Enter your name: ")
+n = int(input("Enter how many times to print: "))
+
+for i in range(n):
+    print(name)
+Using while loop:
+python
+name = input("Enter your name: ")
+n = int(input("Enter how many times to print: "))
+
+count = 0
+while count < n:
+    print(name)
+    count += 1
+
+b) Handle Divided by Zero Exception
+python
+try:
+    num = float(input("Enter numerator: "))
+    denom = float(input("Enter denominator: "))
+    result = num / denom
+    print("Result:", result)
+except ZeroDivisionError:
+    print("Error: Division by zero is not allowed.")
+
+c) Print current time for 10 times with an interval of 10 seconds
+python
+import time
+
+for i in range(10):
+    print("Current Time:", time.strftime("%Y-%m-%d %H:%M:%S"))
+    time.sleep(10)  # sleep for 10 seconds
+
+d) Read a file line by line and print the word count of each line
+python
+filename = input("Enter file name: ")
+try:
+    with open(filename, 'r') as f:
+        for line_num, line in enumerate(f, 1):
+            word_count = len(line.split())
+            print(f"Line {line_num}: {word_count} words")
+except FileNotFoundError:
+    print("File not found.")

@@ -1,0 +1,228 @@
+Slip 5
+Q.1 Write a Java Program to implement Adapter pattern for Enumeration iterator
+EnumerationAdapterTest.java
+import java.util.*;
+
+// Adapter class: adapts Enumeration to Iterator
+class EnumerationIteratorAdapter<T> implements Iterator<T> {
+    private Enumeration<T> enumeration;
+
+    public EnumerationIteratorAdapter(Enumeration<T> enumeration) {
+        this.enumeration = enumeration;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return enumeration.hasMoreElements();
+    }
+
+    @Override
+    public T next() {
+        return enumeration.nextElement();
+    }
+
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException("Remove not supported by Enumeration");
+    }
+}
+
+// Demo/test
+public class EnumerationAdapterTest {
+    public static void main(String[] args) {
+        // Create an old-style Vector
+        Vector<String> vector = new Vector<>();
+        vector.add("Apple");
+        vector.add("Banana");
+        vector.add("Cherry");
+
+        // Get Enumeration
+        Enumeration<String> enumeration = vector.elements();
+
+        // Use adapter to turn Enumeration into Iterator
+        Iterator<String> iterator = new EnumerationIteratorAdapter<>(enumeration);
+
+        System.out.println("Iterating using Iterator (via Adapter):");
+        while (iterator.hasNext()) {
+            System.out.println(iterator.next());
+        }
+    }
+}
+
+
+Q.2 Write a program to connect with the available Wi-Fi using Arduino.
+Code :-
+
+#include <WiFi.h>
+
+const char* ssid     = "Wokwi-GUEST";  // WiFi network name (use simulated network in Wokwi)
+const char* password = "";             // No password for Wokwi-GUEST
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println();
+  Serial.print("Connecting to WiFi: ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, password);
+
+  // Wait until connected
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println();
+  Serial.println("WiFi connected!");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
+void loop() {
+  // Add your main code here
+}
+
+
+
+
+
+
+
+Slip 6
+Q.1 Write a Java Program to implement command pattern to test Remote Control
+RemoteControlTest.java
+// Command interface
+interface Command {
+    void execute();
+}
+
+// Receiver classes
+class Light {
+    public void on() { System.out.println("Light is ON"); }
+    public void off() { System.out.println("Light is OFF"); }
+}
+
+class GarageDoor {
+    public void up() { System.out.println("Garage Door is UP"); }
+    public void down() { System.out.println("Garage Door is DOWN"); }
+}
+
+// Concrete Command classes
+class LightOnCommand implements Command {
+    private Light light;
+    public LightOnCommand(Light light) { this.light = light; }
+    public void execute() { light.on(); }
+}
+
+class LightOffCommand implements Command {
+    private Light light;
+    public LightOffCommand(Light light) { this.light = light; }
+    public void execute() { light.off(); }
+}
+
+class GarageDoorUpCommand implements Command {
+    private GarageDoor garageDoor;
+    public GarageDoorUpCommand(GarageDoor garageDoor) { this.garageDoor = garageDoor; }
+    public void execute() { garageDoor.up(); }
+}
+
+class GarageDoorDownCommand implements Command {
+    private GarageDoor garageDoor;
+    public GarageDoorDownCommand(GarageDoor garageDoor) { this.garageDoor = garageDoor; }
+    public void execute() { garageDoor.down(); }
+}
+
+// Invoker: RemoteControl
+class RemoteControl {
+    private Command slot; // Only one slot for demo
+    public void setCommand(Command command) { this.slot = command; }
+    public void pressButton() { slot.execute(); }
+}
+
+// Test main
+public class RemoteControlTest {
+    public static void main(String[] args) {
+        RemoteControl remote = new RemoteControl();
+
+        Light light = new Light();
+        GarageDoor garageDoor = new GarageDoor();
+
+        Command lightOn = new LightOnCommand(light);
+        Command lightOff = new LightOffCommand(light);
+        Command garageUp = new GarageDoorUpCommand(garageDoor);
+        Command garageDown = new GarageDoorDownCommand(garageDoor);
+
+        System.out.println("Testing Remote Control:");
+
+        remote.setCommand(lightOn);
+        remote.pressButton();
+
+        remote.setCommand(lightOff);
+        remote.pressButton();
+
+        remote.setCommand(garageUp);
+        remote.pressButton();
+
+        remote.setCommand(garageDown);
+        remote.pressButton();
+    }
+}
+
+
+
+
+
+Q.2 Write a program to get temperature notification using Arduino.
+Temperature Notification Using Arduino in Wokwi
+1. Select Board & Components
+Board: Select Arduino Uno
+Sensor: Add DHT22 or DHT11 temperature and humidity sensor
+(Search “DHT22” or “DHT11” and add one)
+LED or Buzzer (for notification)
+220Ω resistor (for LED)
+
+2. Wiring Setup
+DHT22/DHT11 Sensor:
+VCC → Arduino 5V
+GND → Arduino GND
+Data → Arduino digital pin 2
+LED:
+Anode (+) → Arduino pin 13 (with resistor to GND)
+Cathode (–) → GND
+Code 
+#include "DHT.h"
+
+#define DHTPIN 2      // Pin connected to the data pin of DHT22
+#define DHTTYPE DHT22 // DHT22 sensor type
+#define LED_PIN 13    // Notification LED pin
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+  pinMode(LED_PIN, OUTPUT);
+}
+
+void loop() {
+  float temp = dht.readTemperature();
+
+  if (isnan(temp)) {
+    Serial.println("Failed to read from DHT22 sensor!");
+    digitalWrite(LED_PIN, LOW);
+    return;
+  }
+
+  Serial.print("Temperature: ");
+  Serial.print(temp);
+  Serial.println(" °C");
+
+  // Notification: If temperature > 30 °C
+  if (temp > 30) {
+    Serial.println("Temperature HIGH! Notification triggered.");
+    digitalWrite(LED_PIN, HIGH); // Turn LED on
+  } else {
+    digitalWrite(LED_PIN, LOW);  // Turn LED off
+  }
+
+  delay(2000); // Wait 2 seconds before next reading
+}
